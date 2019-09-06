@@ -3,12 +3,9 @@
 
 typedef struct
 {
-	UART_HandleTypeDef	*uart;
-	GPIO_TypeDef 		*busy_port;
-    uint16_t 			busy_pin;
-} yx5200_struct;
+	uint8_t				i2c_adr;
+} ds3231_struct;
 
-void ds3231_init (yx5200_struct *yx5200_handler);
-void ds3231_with_index (yx5200_struct *yx5200_handler, uint8_t song_index_u8);
+void ds3231_GetTime(ds3231_struct *_ds3221_handler, RTC_TimeTypeDef * _timeSt, RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart);
 
 #endif // DS3231_SM_H_INCLUDED
