@@ -6,7 +6,7 @@
 //	#define ADR_I2C_DS3231 0x68
 //-------------------------------------------------------------------------------------------------------------
 
-void ds3231_PrintTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart)
+void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart)
 {
 	char DataChar[100];
 
@@ -15,7 +15,7 @@ void ds3231_PrintTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt, UART_H
 }
 //-------------------------------------------------------------------------------------------------------------
 
-void ds3231_PrintDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart)
+void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart)
 {
 	char DataChar[100];
 
