@@ -5,6 +5,56 @@
 
 //	#define ADR_I2C_DS3231 0x68
 
+typedef enum
+{
+	DS3231_SECONDS	= 0x00		,
+	DS3231_MINUTES				,
+	DS3231_HOUR					,
+	DS3231_WEEKDAY				,
+	DS3231_DATE					,
+	DS3231_MONTH				,
+	DS3231_YEAR					,
+	DS3231_ALARM_1_SECONDS		,
+	DS3231_ALARM_1_MINUTES		,
+	DS3231_ALARM_1_HOUR			,
+	DS3231_ALARM_1_DAY_AND_DATE	,
+	DS3231_ALARM_2_MINUTES		,
+	DS3231_ALARM_2_HOUR			,
+	DS3231_ALARM_2_DAY_AND_DATE	,
+	DS3231_CONTROL				,
+	DS3231_CONTROL_STATUS		,
+	DS3231_AGING_OFFSET			,
+	DS3231_MSB_OF_TEMP			,
+	DS3231_lSB_OF_TEMP
+}		ds3231_register ;
+
+
+typedef enum
+{
+	DS3231_CONTROL_A1IE	=	0x00,
+	DS3231_CONTROL_A2IE			,
+	DS3231_CONTROL_INTCN		,
+	DS3231_CONTROL_RS1			,
+	DS3231_CONTROL_RS2			,
+	DS3231_CONTROL_CONV			,
+	DS3231_CONTROL_BBSQW		,
+	DS3231_CONTROL_EOSC
+}		ds3231_register_status ;
+
+
+typedef enum
+{
+	DS3231_CNTRL_STATUS_A1F	= 0x00	,
+	DS3231_CNTRL_STATUS_A2F			,
+	DS3231_CNTRL_STATUS_BSY			,
+	DS3231_CNTRL_STATUS_EN32KHZ		,
+	DS3231_CNTRL_STATUS_EMPTY_4		,
+	DS3231_CNTRL_STATUS_EMPTY_5		,
+	DS3231_CNTRL_STATUS_EMPTY_6		,
+	DS3231_CNTRL_STATUS_OSF
+}	ds3231_register_cntrl_status ;
+
+
 void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart)
 {
 	char DataChar[100];
@@ -45,9 +95,9 @@ void ds3231_GetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt)
 	uint8_t ds3231_Minutes ;
 	uint8_t ds3231_Hours   ;
 
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x00, &ds3231_Seconds, 100);
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x01, &ds3231_Minutes, 100);
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x02, &ds3231_Hours,   100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_SECONDS , &ds3231_Seconds, 100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_MINUTES , &ds3231_Minutes, 100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_HOUR	 , &ds3231_Hours,   100);
 
 	_timeSt->Hours   = (ds3231_Hours   >> 4)*10 + (ds3231_Hours   &0x0F);
 	_timeSt->Minutes = (ds3231_Minutes >> 4)*10 + (ds3231_Minutes &0x0F);
@@ -62,10 +112,10 @@ void ds3231_GetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt)
 	uint8_t ds3231_Mouth   ;
 	uint8_t ds3231_Year    ;
 
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x03, &ds3231_WeekDay, 100);
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x04, &ds3231_Date,    100);
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x05, &ds3231_Mouth,   100);
-	I2Cdev_readByte( _ds3231_i2c_adr, 0x06, &ds3231_Year,    100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_WEEKDAY, &ds3231_WeekDay, 100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_DATE	, &ds3231_Date,    100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_MONTH	, &ds3231_Mouth,   100);
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_YEAR	, &ds3231_Year,    100);
 
 	_dateSt->WeekDay = (ds3231_WeekDay >> 4)*10 + (ds3231_WeekDay &0x0F);
 	_dateSt->Date    = (ds3231_Date    >> 4)*10 + (ds3231_Date    &0x0F);
@@ -76,66 +126,65 @@ void ds3231_GetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt)
 
 void ds3231_SetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt)
 {
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x00, _timeSt->Seconds );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x01, _timeSt->Minutes );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x02, _timeSt->Hours   );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_SECONDS, _timeSt->Seconds );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_MINUTES, _timeSt->Minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_HOUR	 , _timeSt->Hours   );
 }
 
 void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt)
 {
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x03, _dateSt->WeekDay );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x04, _dateSt->Date    );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x05, _dateSt->Month   );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x06, _dateSt->Year    );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_WEEKDAY, _dateSt->WeekDay );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_DATE	 , _dateSt->Date    );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_MONTH  , _dateSt->Month   );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_YEAR   , _dateSt->Year    );
 }
-
 
 void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr)
 {
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x07, 1UL<<7 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x08, 1UL<<7 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x09, 1UL<<7 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0A, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_SECONDS		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_MINUTES		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_HOUR	 		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_DAY_AND_DATE	, 1UL<<7 );
 
 	uint8_t alarm_status;
-	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00000101 );
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<DS3231_CONTROL_A1IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL, alarm_status );
 }
 
 void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second)
 {
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x07, _second );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x08, 1UL<<7 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x09, 1UL<<7 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0A, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_SECONDS		, _second );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_MINUTES		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_HOUR			, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_DAY_AND_DATE	, 1UL<<7 );
 
 	uint8_t alarm_status;
-	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
-	alarm_status = alarm_status||(1UL<<2)||(1UL<<0);
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00000101 );	// ????????????
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A1IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
 }
 
 void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr)
 {
 	uint8_t status_bit;
-	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0F, &status_bit, 100   );
-	status_bit = status_bit && (0UL<<0);
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0F, status_bit );
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, &status_bit, 100   );
+	status_bit = status_bit & (0UL<<DS3231_CNTRL_STATUS_A1F);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, status_bit );
 }
 
 void ds3231_Alarm2_ClearStatusBit(uint8_t _ds3231_i2c_adr)
 {
 	uint8_t status_bit;
-	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0F, &status_bit, 100   );
-	status_bit = status_bit && (0UL<<1);
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0F, status_bit );
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, &status_bit, 100   );
+	status_bit = status_bit & (0UL<<DS3231_CNTRL_STATUS_A2F);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, status_bit );
 }
 
 void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr)
 {
 	uint8_t alarm_status;
-	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
-	//I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status&&(0UL) );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00011111 );
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	// ??? I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status&&(0UL) );
+	// ??? I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  0b00011111 );
 }
