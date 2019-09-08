@@ -7,8 +7,16 @@ void ds3231_GetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 void ds3231_SetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt);
 void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 
-void ds3231_PrintTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart);
-void ds3231_PrintDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart);
+void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart);
+void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart);
+
+void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second);
+void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr);
+
+void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr);
+
+void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr);
+void ds3231_Alarm2_ClearStatusBit(uint8_t _ds3231_i2c_adr);
 
 #endif // DS3231_SM_H_INCLUDED
 
@@ -71,7 +79,7 @@ void ds3231_PrintDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt, UART_H
 //	HAL_RTC_GetTime( &hrtc, &TimeSt, RTC_FORMAT_BIN );
 //	HAL_RTC_GetDate( &hrtc, &DateSt, RTC_FORMAT_BIN );
 //
-//	ds3231_PrintTime(ADR_I2C_DS3231, &TimeSt, &huart1);
-//	ds3231_PrintDate(ADR_I2C_DS3231, &DateSt, &huart1);
+//	ds3231_PrintTime(&TimeSt, &huart1);
+//	ds3231_PrintDate(&DateSt, &huart1);
 //
 // 				END
