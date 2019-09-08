@@ -11,13 +11,12 @@ void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart);
 void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart);
 
 void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second);
-void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_huart);
+void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr);
 
 void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr);
 
-void ds3231_Alarm1_ReadStatusBit(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_huart);
-
-void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_huart);
+void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr);
+void ds3231_Alarm2_ClearStatusBit(uint8_t _ds3231_i2c_adr);
 
 #endif // DS3231_SM_H_INCLUDED
 

@@ -90,7 +90,7 @@ void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt)
 }
 
 
-void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_huart)
+void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr)
 {
 	I2Cdev_writeByte( _ds3231_i2c_adr, 0x07, 1UL<<7 );
 	I2Cdev_writeByte( _ds3231_i2c_adr, 0x08, 1UL<<7 );
@@ -99,16 +99,8 @@ void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_
 
 	uint8_t alarm_status;
 	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
-
-	char DataChar[100];
-	sprintf(DataChar,"alarm_status %d\r\n", (int)alarm_status);
-	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
-
 	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00000101 );
-
-//	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00011111 );
 }
-
 
 void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second)
 {
@@ -117,43 +109,31 @@ void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second)
 	I2Cdev_writeByte( _ds3231_i2c_adr, 0x09, 1UL<<7 );
 	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0A, 1UL<<7 );
 
-//	uint8_t alarm_status;
-//	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
-//	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status||(1UL<<2)||(1UL) );
-
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00000101 );
-
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
+	alarm_status = alarm_status||(1UL<<2)||(1UL<<0);
+	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status );
+	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  0b00000101 );	// ????????????
 }
 
-void ds3231_Alarm1_ReadStatusBit(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_huart)
+void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr)
 {
 	uint8_t status_bit;
 	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0F, &status_bit, 100   );
-
-	char DataChar[100];
-	sprintf(DataChar,"status_bit %d\r\n", (int)status_bit);
-	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+	status_bit = status_bit && (0UL<<0);
+	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0F, status_bit );
 }
 
-void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr,UART_HandleTypeDef *_huart)
+void ds3231_Alarm2_ClearStatusBit(uint8_t _ds3231_i2c_adr)
 {
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0F,  0b10001000 );
-
 	uint8_t status_bit;
 	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0F, &status_bit, 100   );
-
-	char DataChar[100];
-	sprintf(DataChar,"_clear_bit %d\r\n", (int)status_bit);
-	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+	status_bit = status_bit && (0UL<<1);
+	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0F, status_bit );
 }
 
 void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr)
 {
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x07, 0 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x08, 0 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x09, 0 );
-	I2Cdev_writeByte( _ds3231_i2c_adr, 0x0A, 0 );
-
 	uint8_t alarm_status;
 	I2Cdev_readByte ( _ds3231_i2c_adr, 0x0E, &alarm_status, 100   );
 	//I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status&&(0UL) );
