@@ -68,18 +68,19 @@ void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart)
 {
 	char DataChar[100];
 
-	sprintf(DataChar,"%04d/%02d/%02d ",2000+ _dateSt->Year, _dateSt->Month, _dateSt->Date);
+	sprintf(DataChar,"%02d/%02d/%04d ", _dateSt->Date, _dateSt->Month, 2000+ _dateSt->Year);
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 
 	switch(_dateSt->WeekDay)
 		{
-		case  7: sprintf(DataChar,"Sunday"); 		break;
+		case  0: sprintf(DataChar,"Sunday"); 		break;
 		case  1: sprintf(DataChar,"Monday");		break;
 		case  2: sprintf(DataChar,"Tuesday"); 		break;
 		case  3: sprintf(DataChar,"Wednesday");		break;
 		case  4: sprintf(DataChar,"Thursday");		break;
 		case  5: sprintf(DataChar,"Friday");		break;
 		case  6: sprintf(DataChar,"Saturday");		break;
+		case  7: sprintf(DataChar,"Sunday"); 		break;
 		default: sprintf(DataChar,"Out of day");	break;
 		} // end switch Date.ST
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
