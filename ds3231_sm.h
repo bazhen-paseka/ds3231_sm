@@ -1,11 +1,18 @@
 #ifndef DS3231_SM_H_INCLUDED
 #define DS3231_SM_H_INCLUDED
 
+	#include "stm32f1xx_hal.h"
+	#include "i2c_techmaker_sm.h"
+	#include <string.h>
+	#include "stdio.h"
+
+	#define ADR_I2C_DS3231 0x68
+
+void Set_Date_and_Time_by_str(RTC_DateTypeDef * _dateSt, RTC_TimeTypeDef * _timeSt);
+void Set_Date_and_Time_to_DS3231(uint8_t _year_u8, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8);
+
 void ds3231_GetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt);
 void ds3231_GetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
-
-void ds3231_SetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt);
-void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 
 void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart);
 void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart);

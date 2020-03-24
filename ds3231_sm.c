@@ -1,7 +1,6 @@
-#include "stm32f1xx_hal.h"
-#include "i2c_techmaker_sm.h"
-#include "ds3231_sm.h"
-#include <string.h>
+	#include "stm32f1xx_hal.h"
+	#include "ds3231_sm.h"
+
 
 //	#define ADR_I2C_DS3231 0x68
 
@@ -54,6 +53,9 @@ typedef enum
 	DS3231_CNTRL_STATUS_OSF
 }	ds3231_register_cntrl_status ;
 
+
+void ds3231_SetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt);
+void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 
 void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart)
 {
@@ -188,4 +190,31 @@ void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr)
 	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
 	// ??? I2Cdev_writeByte( _ds3231_i2c_adr, 0x0E,  alarm_status&&(0UL) );
 	// ??? I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  0b00011111 );
+}
+
+void Set_Date_and_Time_by_str(RTC_DateTypeDef * _dateSt, RTC_TimeTypeDef * _timeSt ) {
+	_dateSt->Year  = 0x20;
+	_dateSt->Month = 0x03;
+	_dateSt->Date  = 0x23;
+	ds3231_SetDate(ADR_I2C_DS3231, _dateSt);
+
+	_timeSt->Hours		= 0x13 ;
+	_timeSt->Minutes	= 0x55 ;
+	_timeSt->Seconds	= 0x00 ;
+	ds3231_SetTime(ADR_I2C_DS3231, _timeSt);
+}
+
+void Set_Date_and_Time_to_DS3231(uint8_t _year_u8, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
+
+	RTC_DateTypeDef DateStr   ;
+	DateStr.Year  = _year_u8  ;
+	DateStr.Month = _month_u8 ;
+	DateStr.Date  = _date_u8  ;
+	ds3231_SetDate(ADR_I2C_DS3231, &DateStr);
+
+	RTC_TimeTypeDef    TimeStr    ;
+	TimeStr.Hours   = _hours_u8   ;
+	TimeStr.Minutes = _minutes_u8 ;
+	TimeStr.Seconds = _seconds_u8 ;
+	ds3231_SetTime(ADR_I2C_DS3231, &TimeStr);
 }
