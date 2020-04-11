@@ -1,12 +1,30 @@
 #ifndef DS3231_SM_H_INCLUDED
 #define DS3231_SM_H_INCLUDED
 
-	#include "stm32f1xx_hal.h"
-	#include "i2c_techmaker_sm.h"
+/*
+**************************************************************************
+*								INCLUDE FILES
+**************************************************************************
+*/
+
+	#include "main.h"
 	#include <string.h>
 	#include "stdio.h"
+	#include "i2c_techmaker_sm.h"
+
+/*
+**************************************************************************
+*								    DEFINES
+**************************************************************************
+*/
 
 	#define ADR_I2C_DS3231 0x68
+
+/*
+**************************************************************************
+*                              FUNCTION PROTOTYPES
+**************************************************************************
+*/
 
 void Set_Date_and_Time_by_str(RTC_DateTypeDef * _dateSt, RTC_TimeTypeDef * _timeSt);
 void Set_Date_and_Time_to_DS3231(uint8_t _year_u8, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8);
