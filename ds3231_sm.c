@@ -76,7 +76,6 @@ void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 
 void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart) {
 	char DataChar[100];
-
 	sprintf(DataChar,"%02d:%02d:%02d ",_timeSt->Hours, _timeSt->Minutes, _timeSt->Seconds);
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 }
@@ -84,10 +83,13 @@ void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart) {
 
 void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
 	char DataChar[100];
-
 	sprintf(DataChar,"%02d/%02d/%04d ", _dateSt->Date, _dateSt->Month, 2000+ _dateSt->Year);
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+}
+//************************************************************************
 
+void ds3231_PrintWeek(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
+	char DataChar[100];
 	switch(_dateSt->WeekDay) 		{
 		case  0: sprintf(DataChar,"Sunday "); 		break;
 		case  1: sprintf(DataChar,"Monday ");		break;
@@ -100,9 +102,6 @@ void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
 		default: sprintf(DataChar,"Out of day ");	break;
 		} // end switch Date.ST
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
-
-//	sprintf(DataChar,"\r\n");
-//	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 }
 //************************************************************************
 
