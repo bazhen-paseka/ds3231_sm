@@ -61,6 +61,17 @@ typedef enum {
 
 /*
 **************************************************************************
+*								    DEFINES
+**************************************************************************
+*/
+
+	//	#define SET_BIT(var, pos) ((var) |= (1UL << (pos)))
+		#define CLR_BIT(var, pos) (var &= ~(1UL << (pos)))
+		#define CHECK_BIT(var, pos) (((var) & (1UL << (pos))) != 0)
+
+
+/*
+**************************************************************************
 *                              FUNCTION PROTOTYPES
 **************************************************************************
 */
@@ -166,6 +177,18 @@ void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr) {
 }
 //************************************************************************
 
+void ds3231_Alarm2_SetEveryMinutes(uint8_t _ds3231_i2c_adr) {
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR	 		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<DS3231_CONTROL_A2IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL, alarm_status );
+}
+//************************************************************************
+
 void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second) {
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_SECONDS		, _second );
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_MINUTES		, 1UL<<7 );
@@ -178,6 +201,44 @@ void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second) {
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
 }
 //************************************************************************
+
+void ds3231_Alarm2_SetMinuses(uint8_t _ds3231_i2c_adr, uint8_t _minutes) {
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, _minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR			, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A2IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
+}
+//************************************************************************
+
+void ds3231_Alarm1_SetHoursAndMinuses(uint8_t _ds3231_i2c_adr, uint8_t _hours, uint8_t _minutes) {
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_SECONDS		, 0x00 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_MINUTES		, _minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_HOUR			, _hours );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A1IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
+}
+//************************************************************************
+
+void ds3231_Alarm2_SetHoursAndMinuses (uint8_t _ds3231_i2c_adr, uint8_t _hours, uint8_t _minutes){
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, _minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR			, _hours );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A2IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
+}
+//************************************************************************
+
 
 void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr) {
 	uint8_t status_bit;
@@ -231,5 +292,22 @@ void Set_Date_and_Time_to_DS3231(uint8_t _year_u8, uint8_t _month_u8, uint8_t _d
 }
 
 //************************************************************************
+
+uint8_t ds3231_Get_Alarm1_Status(uint8_t _ds3231_i2c_adr) {
+	uint8_t alarm1_status_u8 = 0;
+	uint8_t control_status_u8 = 0;
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
+	alarm1_status_u8 = 	CHECK_BIT(control_status_u8, DS3231_CONTROL_A1IE);
+	return alarm1_status_u8;
+}
+//************************************************************************
+
+uint8_t ds3231_Get_Alarm2_Status(uint8_t _ds3231_i2c_adr) {
+	uint8_t alarm_status_u8 = 0;
+	uint8_t control_status_u8 = 0;
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
+	alarm_status_u8 = 	CHECK_BIT(control_status_u8, DS3231_CONTROL_A2IE);
+	return alarm_status_u8;
+}
 //************************************************************************
 //************************************************************************
