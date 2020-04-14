@@ -276,18 +276,19 @@ void Set_Date_and_Time_by_str(RTC_DateTypeDef * _dateSt, RTC_TimeTypeDef * _time
 }
 //************************************************************************
 
-void Set_Date_and_Time_to_DS3231(uint8_t _year_u8, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
+void Set_Date_and_Time_to_DS3231(uint16_t _year_u16, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
 
 	RTC_DateTypeDef DateStr   ;
-	DateStr.Year  = _year_u8  ;
-	DateStr.Month = _month_u8 ;
-	DateStr.Date  = _date_u8  ;
+	uint8_t _year_u8 = (uint8_t)(_year_u16 - 2000);
+	DateStr.Year  = ( _year_u8/10)*16 +  _year_u8%10 ;
+	DateStr.Month = (_month_u8/10)*16 + _month_u8%10 ;
+	DateStr.Date  = ( _date_u8/10)*16 +  _date_u8%10 ;
 	ds3231_SetDate(ADR_I2C_DS3231, &DateStr);
 
 	RTC_TimeTypeDef    TimeStr    ;
-	TimeStr.Hours   = _hours_u8   ;
-	TimeStr.Minutes = _minutes_u8 ;
-	TimeStr.Seconds = _seconds_u8 ;
+	TimeStr.Hours   = (  _hours_u8/10)*16 +   _hours_u8%10 ;
+	TimeStr.Minutes = (_minutes_u8/10)*16 + _minutes_u8%10 ;
+	TimeStr.Seconds = (_seconds_u8/10)*16 + _seconds_u8%10 ;
 	ds3231_SetTime(ADR_I2C_DS3231, &TimeStr);
 }
 
