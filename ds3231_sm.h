@@ -10,6 +10,8 @@
 	#include "main.h"
 	#include <string.h>
 	#include "stdio.h"
+
+	#include "ds3231_local_config.h"
 	#include "i2c_techmaker_sm.h"
 
 /*
@@ -17,8 +19,6 @@
 *								    DEFINES
 **************************************************************************
 */
-
-	#define ADR_I2C_DS3231 0x68
 
 /*
 **************************************************************************
