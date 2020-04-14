@@ -61,6 +61,17 @@ typedef enum {
 
 /*
 **************************************************************************
+*								    DEFINES
+**************************************************************************
+*/
+
+	//	#define SET_BIT(var, pos) ((var) |= (1UL << (pos)))
+		#define CLR_BIT(var, pos) (var &= ~(1UL << (pos)))
+		#define CHECK_BIT(var, pos) (((var) & (1UL << (pos))) != 0)
+
+
+/*
+**************************************************************************
 *                              FUNCTION PROTOTYPES
 **************************************************************************
 */
@@ -76,7 +87,6 @@ void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 
 void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart) {
 	char DataChar[100];
-
 	sprintf(DataChar,"%02d:%02d:%02d ",_timeSt->Hours, _timeSt->Minutes, _timeSt->Seconds);
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 }
@@ -84,24 +94,24 @@ void ds3231_PrintTime(RTC_TimeTypeDef * _timeSt, UART_HandleTypeDef *_huart) {
 
 void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
 	char DataChar[100];
-
 	sprintf(DataChar,"%02d/%02d/%04d ", _dateSt->Date, _dateSt->Month, 2000+ _dateSt->Year);
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+}
+//************************************************************************
 
+void ds3231_PrintWeek(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
+	char DataChar[100];
 	switch(_dateSt->WeekDay) 		{
-		case  0: sprintf(DataChar,"Sunday"); 		break;
-		case  1: sprintf(DataChar,"Monday");		break;
-		case  2: sprintf(DataChar,"Tuesday"); 		break;
-		case  3: sprintf(DataChar,"Wednesday");		break;
-		case  4: sprintf(DataChar,"Thursday");		break;
-		case  5: sprintf(DataChar,"Friday");		break;
-		case  6: sprintf(DataChar,"Saturday");		break;
-		case  7: sprintf(DataChar,"Sunday"); 		break;
-		default: sprintf(DataChar,"Out of day");	break;
+		case  0: sprintf(DataChar,"Sunday "); 		break;
+		case  1: sprintf(DataChar,"Monday ");		break;
+		case  2: sprintf(DataChar,"Tuesday "); 		break;
+		case  3: sprintf(DataChar,"Wednesday ");		break;
+		case  4: sprintf(DataChar,"Thursday ");		break;
+		case  5: sprintf(DataChar,"Friday ");		break;
+		case  6: sprintf(DataChar,"Saturday ");		break;
+		case  7: sprintf(DataChar,"Sunday "); 		break;
+		default: sprintf(DataChar,"Out of day ");	break;
 		} // end switch Date.ST
-	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
-
-	sprintf(DataChar,"\r\n");
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 }
 //************************************************************************
@@ -167,6 +177,18 @@ void ds3231_Alarm1_SetEverySeconds(uint8_t _ds3231_i2c_adr) {
 }
 //************************************************************************
 
+void ds3231_Alarm2_SetEveryMinutes(uint8_t _ds3231_i2c_adr) {
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR	 		, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<DS3231_CONTROL_A2IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL, alarm_status );
+}
+//************************************************************************
+
 void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second) {
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_SECONDS		, _second );
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_MINUTES		, 1UL<<7 );
@@ -179,6 +201,44 @@ void ds3231_Alarm1_SetSeconds(uint8_t _ds3231_i2c_adr, uint8_t _second) {
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
 }
 //************************************************************************
+
+void ds3231_Alarm2_SetMinuses(uint8_t _ds3231_i2c_adr, uint8_t _minutes) {
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, _minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR			, 1UL<<7 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A2IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
+}
+//************************************************************************
+
+void ds3231_Alarm1_SetHoursAndMinuses(uint8_t _ds3231_i2c_adr, uint8_t _hours, uint8_t _minutes) {
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_SECONDS		, 0x00 );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_MINUTES		, _minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_HOUR			, _hours );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_1_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A1IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
+}
+//************************************************************************
+
+void ds3231_Alarm2_SetHoursAndMinuses (uint8_t _ds3231_i2c_adr, uint8_t _hours, uint8_t _minutes){
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, _minutes );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR			, _hours );
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_DAY_AND_DATE	, 1UL<<7 );
+
+	uint8_t alarm_status;
+	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
+	alarm_status = alarm_status | (1UL<<DS3231_CONTROL_INTCN) | (1UL<<DS3231_CONTROL_A2IE);
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL,  alarm_status );
+}
+//************************************************************************
+
 
 void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr) {
 	uint8_t status_bit;
@@ -216,21 +276,39 @@ void Set_Date_and_Time_by_str(RTC_DateTypeDef * _dateSt, RTC_TimeTypeDef * _time
 }
 //************************************************************************
 
-void Set_Date_and_Time_to_DS3231(uint8_t _year_u8, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
+void Set_Date_and_Time_to_DS3231(uint16_t _year_u16, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
 
 	RTC_DateTypeDef DateStr   ;
-	DateStr.Year  = _year_u8  ;
-	DateStr.Month = _month_u8 ;
-	DateStr.Date  = _date_u8  ;
+	uint8_t _year_u8 = (uint8_t)(_year_u16 - 2000);
+	DateStr.Year  = ( _year_u8/10)*16 +  _year_u8%10 ;
+	DateStr.Month = (_month_u8/10)*16 + _month_u8%10 ;
+	DateStr.Date  = ( _date_u8/10)*16 +  _date_u8%10 ;
 	ds3231_SetDate(ADR_I2C_DS3231, &DateStr);
 
 	RTC_TimeTypeDef    TimeStr    ;
-	TimeStr.Hours   = _hours_u8   ;
-	TimeStr.Minutes = _minutes_u8 ;
-	TimeStr.Seconds = _seconds_u8 ;
+	TimeStr.Hours   = (  _hours_u8/10)*16 +   _hours_u8%10 ;
+	TimeStr.Minutes = (_minutes_u8/10)*16 + _minutes_u8%10 ;
+	TimeStr.Seconds = (_seconds_u8/10)*16 + _seconds_u8%10 ;
 	ds3231_SetTime(ADR_I2C_DS3231, &TimeStr);
 }
 
 //************************************************************************
+
+uint8_t ds3231_Get_Alarm1_Status(uint8_t _ds3231_i2c_adr) {
+	uint8_t alarm1_status_u8 = 0;
+	uint8_t control_status_u8 = 0;
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
+	alarm1_status_u8 = 	CHECK_BIT(control_status_u8, DS3231_CONTROL_A1IE);
+	return alarm1_status_u8;
+}
+//************************************************************************
+
+uint8_t ds3231_Get_Alarm2_Status(uint8_t _ds3231_i2c_adr) {
+	uint8_t alarm_status_u8 = 0;
+	uint8_t control_status_u8 = 0;
+	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
+	alarm_status_u8 = 	CHECK_BIT(control_status_u8, DS3231_CONTROL_A2IE);
+	return alarm_status_u8;
+}
 //************************************************************************
 //************************************************************************
