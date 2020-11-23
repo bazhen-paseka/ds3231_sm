@@ -276,7 +276,7 @@ void Set_Date_and_Time_by_str(RTC_DateTypeDef * _dateSt, RTC_TimeTypeDef * _time
 }
 //************************************************************************
 
-void Set_Date_and_Time_to_DS3231(uint16_t _year_u16, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
+void Set_Day_and_Time_to_DS3231(uint16_t _year_u16, uint8_t _month_u8, uint8_t _date_u8, uint8_t _hours_u8, uint8_t _minutes_u8, uint8_t _seconds_u8) {
 
 	RTC_DateTypeDef DateStr   ;
 	uint8_t _year_u8 = (uint8_t)(_year_u16 - 2000);
