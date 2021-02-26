@@ -100,19 +100,37 @@ void ds3231_PrintDate(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
 //************************************************************************
 
 void ds3231_PrintWeek(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
-	char DataChar[100];
-	switch(_dateSt->WeekDay) 		{
-		case  0: sprintf(DataChar,"Sunday "); 		break;
-		case  1: sprintf(DataChar,"Monday ");		break;
-		case  2: sprintf(DataChar,"Tuesday "); 		break;
-		case  3: sprintf(DataChar,"Wednesday ");		break;
-		case  4: sprintf(DataChar,"Thursday ");		break;
-		case  5: sprintf(DataChar,"Friday ");		break;
-		case  6: sprintf(DataChar,"Saturday ");		break;
-		case  7: sprintf(DataChar,"Sunday "); 		break;
-		default: sprintf(DataChar,"Out of day ");	break;
+	char DataChar[100] ;
+	switch(_dateSt->WeekDay) {
+		case  0: sprintf( DataChar , "Sunday "		) ;		break ;
+		case  1: sprintf( DataChar , "Monday "		) ;		break ;
+		case  2: sprintf( DataChar , "Tuesday "		) ;		break ;
+		case  3: sprintf( DataChar , "Wednesday "	) ;		break ;
+		case  4: sprintf( DataChar , "Thursday "	) ;		break ;
+		case  5: sprintf( DataChar , "Friday "		) ;		break ;
+		case  6: sprintf( DataChar , "Saturday "	) ;		break ;
+		case  7: sprintf( DataChar , "Sunday "		) ;		break ;
+		default: sprintf( DataChar , "Out of day "	) ;		break ;
 		} // end switch Date.ST
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+}
+//************************************************************************
+
+void ds3231_PrintWeek3char(RTC_DateTypeDef * _dateSt, UART_HandleTypeDef *_huart) {
+	char DataChar[5] ;
+	uint8_t day_u8 = ( _dateSt->WeekDay + 3 ) %6 ;
+	switch(day_u8) {
+		case  0: sprintf( DataChar , "SUN " ) ;	break ;
+		case  1: sprintf( DataChar , "MON " ) ;	break ;
+		case  2: sprintf( DataChar , "TUE " ) ;	break ;
+		case  3: sprintf( DataChar , "WED " ) ;	break ;
+		case  4: sprintf( DataChar , "THU " ) ;	break ;
+		case  5: sprintf( DataChar , "FRI " ) ;	break ;
+		case  6: sprintf( DataChar , "SAT " ) ;	break ;
+		case  7: sprintf( DataChar , "SUN" ) ; 	break ;
+		default: sprintf( DataChar , "ERR" ) ;	break ;
+		} // end switch Date.ST
+	HAL_UART_Transmit( _huart , (uint8_t *)DataChar , strlen(DataChar) , 100) ;
 }
 //************************************************************************
 
