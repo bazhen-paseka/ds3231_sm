@@ -1,3 +1,20 @@
+/**
+* \file
+* \version 1.0
+* \author bazhen.levkovets
+** \date 2018
+*
+*************************************************************************************
+* \copyright	Bazhen Levkovets
+* \copyright	Brovary, Kyiv region
+* \copyright	Ukraine
+*
+*************************************************************************************
+*
+* \brief
+*
+*/
+
 #ifndef DS3231_SM_H_INCLUDED
 #define DS3231_SM_H_INCLUDED
 
@@ -6,14 +23,12 @@
 *								INCLUDE FILES
 **************************************************************************
 */
-
 	#include "main.h"
 	#include <string.h>
 	#include "stdio.h"
 
 	#include "ds3231_local_config.h"
 	#include "i2c_techmaker_sm.h"
-
 /*
 **************************************************************************
 *								    DEFINES
@@ -53,6 +68,16 @@ void ds3231_Alarm2_ClearStatusBit	(uint8_t _ds3231_i2c_adr)	;
 
 uint8_t ds3231_Get_Alarm1_Status	(uint8_t _ds3231_i2c_adr)	;
 uint8_t ds3231_Get_Alarm2_Status	(uint8_t _ds3231_i2c_adr)	;
+
+void 	Ds3231_hard_alarm_flag_Set   	(void) ;
+void 	Ds3231_hard_alarm_flag_Reset 	(void) ;
+uint8_t Ds3231_hard_alarm_flag_Status	(void) ;
+
+/*
+**************************************************************************
+*                                   END
+**************************************************************************
+*/
 
 #endif // DS3231_SM_H_INCLUDED
 
