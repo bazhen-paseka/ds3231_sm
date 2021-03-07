@@ -13,6 +13,11 @@
 **************************************************************************
 */
 
+/*
+**************************************************************************
+*								    ENUM
+**************************************************************************
+*/
 typedef enum {
 	DS3231_SECONDS	= 0x00		,
 	DS3231_MINUTES				,
@@ -62,27 +67,28 @@ typedef enum {
 
 volatile uint8_t ds3231_alarm_u8 = 0 ;
 
-//=============================================
-
 /*
 **************************************************************************
 *								    DEFINES
 **************************************************************************
 */
 
-	//	#define SET_BIT(var, pos) ((var) |= (1UL << (pos)))
-		#define CLR_BIT(var, pos) (var &= ~(1UL << (pos)))
-		#define CHECK_BIT(var, pos) (((var) & (1UL << (pos))) != 0)
-
+/*
+**************************************************************************
+*   							   MACRO'S
+**************************************************************************
+*/
+	#define BIT_SET(   byte , pos )		((byte) |=  (1UL << (pos)))
+	#define BIT_CLR(   byte , pos )		((byte) &= ~(1UL << (pos)))
+	#define BIT_TOGGLE(byte , pos )		((byte) ^=  (1UL << (pos)))
+	#define BIT_CHECK( byte , pos )		((byte) &   (1UL << (pos)))
 /*
 **************************************************************************
 *                              FUNCTION PROTOTYPES
 **************************************************************************
 */
-
-void ds3231_SetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt);
-void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
-
+	void ds3231_SetTime(uint8_t _ds3231_i2c_adr, RTC_TimeTypeDef * _timeSt);
+	void ds3231_SetDate(uint8_t _ds3231_i2c_adr, RTC_DateTypeDef * _dateSt);
 /*
 **************************************************************************
 *                           GLOBAL FUNCTIONS
@@ -320,7 +326,7 @@ uint8_t ds3231_Get_Alarm1_Status(uint8_t _ds3231_i2c_adr) {
 	uint8_t alarm1_status_u8 = 0;
 	uint8_t control_status_u8 = 0;
 	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
-	alarm1_status_u8 = 	CHECK_BIT(control_status_u8, DS3231_CONTROL_A1IE);
+	alarm1_status_u8 = 	BIT_CHECK(control_status_u8, DS3231_CONTROL_A1IE);
 	return alarm1_status_u8;
 }
 //************************************************************************
@@ -329,7 +335,7 @@ uint8_t ds3231_Get_Alarm2_Status(uint8_t _ds3231_i2c_adr) {
 	uint8_t alarm_status_u8 = 0;
 	uint8_t control_status_u8 = 0;
 	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
-	alarm_status_u8 = 	CHECK_BIT(control_status_u8, DS3231_CONTROL_A2IE);
+	alarm_status_u8 = 	BIT_CHECK(control_status_u8, DS3231_CONTROL_A2IE);
 	return alarm_status_u8;
 }
 //************************************************************************
@@ -347,8 +353,8 @@ void Ds3231_hard_alarm_flag_Reset (void) {
 uint8_t Ds3231_hard_alarm_flag_Status (void) {
 	return ds3231_alarm_u8 ;
 }
-//************************************************************************
-
-
-//***************************************************************************
-//************************************************************************
+/*
+**************************************************************************
+*                                   END
+**************************************************************************
+*/

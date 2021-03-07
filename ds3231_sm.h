@@ -23,14 +23,12 @@
 *								INCLUDE FILES
 **************************************************************************
 */
-
 	#include "main.h"
 	#include <string.h>
 	#include "stdio.h"
 
 	#include "ds3231_local_config.h"
 	#include "i2c_techmaker_sm.h"
-
 /*
 **************************************************************************
 *								    DEFINES
@@ -74,6 +72,12 @@ uint8_t ds3231_Get_Alarm2_Status	(uint8_t _ds3231_i2c_adr)	;
 void 	Ds3231_hard_alarm_flag_Set   	(void) ;
 void 	Ds3231_hard_alarm_flag_Reset 	(void) ;
 uint8_t Ds3231_hard_alarm_flag_Status	(void) ;
+
+/*
+**************************************************************************
+*                                   END
+**************************************************************************
+*/
 
 #endif // DS3231_SM_H_INCLUDED
 
