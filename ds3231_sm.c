@@ -34,7 +34,7 @@ typedef enum {
 	DS3231_MSB_OF_TEMP			,
 	DS3231_lSB_OF_TEMP
 }		ds3231_register ;
-
+//=============================================
 
 typedef enum {
 	DS3231_CONTROL_A1IE	=	0x00,
@@ -46,7 +46,7 @@ typedef enum {
 	DS3231_CONTROL_BBSQW		,
 	DS3231_CONTROL_EOSC
 }		ds3231_register_status ;
-
+//=============================================
 
 typedef enum {
 	DS3231_CNTRL_STATUS_A1F	= 0x00	,
@@ -57,7 +57,12 @@ typedef enum {
 	DS3231_CNTRL_STATUS_EMPTY_5		,
 	DS3231_CNTRL_STATUS_EMPTY_6		,
 	DS3231_CNTRL_STATUS_OSF
-}	ds3231_register_cntrl_status ;
+}		ds3231_register_cntrl_status ;
+//=============================================
+
+volatile uint8_t ds3231_alarm_u8 = 0 ;
+
+//=============================================
 
 /*
 **************************************************************************
@@ -68,7 +73,6 @@ typedef enum {
 	//	#define SET_BIT(var, pos) ((var) |= (1UL << (pos)))
 		#define CLR_BIT(var, pos) (var &= ~(1UL << (pos)))
 		#define CHECK_BIT(var, pos) (((var) & (1UL << (pos))) != 0)
-
 
 /*
 **************************************************************************
@@ -329,4 +333,22 @@ uint8_t ds3231_Get_Alarm2_Status(uint8_t _ds3231_i2c_adr) {
 	return alarm_status_u8;
 }
 //************************************************************************
+
+void Ds3231_hard_alarm_flag_Set (void) {
+	ds3231_alarm_u8 = 1 ;
+}
+//************************************************************************
+
+void Ds3231_hard_alarm_flag_Reset (void) {
+	ds3231_alarm_u8 = 0 ;
+}
+//************************************************************************
+
+uint8_t Ds3231_hard_alarm_flag_Status (void) {
+	return ds3231_alarm_u8 ;
+}
+//************************************************************************
+
+
+//***************************************************************************
 //************************************************************************
