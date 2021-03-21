@@ -134,3 +134,61 @@ uint8_t Ds3231_hard_alarm_flag_Status	(void) ;
 //	ds3231_PrintDate(&DateSt, &huart1);
 //
 // 				END
+
+//	ABOUT RESET:
+
+if (_rtc_isenabled != NULL) {
+        if (!(_rtc_isenabled())) {
+                                                                 //added the following three lines
+                        if (_rtc_init != NULL) {
+                                _rtc_init();
+                            }
+     //       set_time(0);// ORIG CODE HERE !!!!!!!!! commented out this will clear the RTC to Zero but alas not only here see below!
+        }
+    }
+//------------	
+
+if (_rtc_isenabled != NULL) {
+        if (!(_rtc_isenabled())) {
+                                                                 //added the following three lines
+                        if (_rtc_init != NULL) {
+                                _rtc_init();
+                            }
+     //       set_time(0);// ORIG CODE HERE !!!!!!!!! commented out this will clear the RTC to Zero but alas not only here see below!
+        }
+    }	
+//------------	
+
+    /* --- BDCR Register ---*/
+/* Alias word address of RTCEN bit */
+#define RCC_BDCR_OFFSET            (RCC_OFFSET + 0x70)
+#define RCC_RTCEN_BIT_NUMBER       0x0F
+#define RCC_BDCR_RTCEN_BB          (PERIPH_BB_BASE + (RCC_BDCR_OFFSET * 32) + (RCC_RTCEN_BIT_NUMBER * 4))
+/* Alias word address of BDRST bit */
+#define RCC_BDRST_BIT_NUMBER       0x10
+#define RCC_BDCR_BDRST_BB          (PERIPH_BB_BASE + (RCC_BDCR_OFFSET * 32) + (RCC_BDRST_BIT_NUMBER * 4))
+//------------	
+
+void rtc_init(void)
+{
+    RCC_OscInitTypeDef RCC_OscInitStruct;
+    uint32_t rtc_freq = 0;
+    
+//add this code here:
+//....................
+ 
+    if(RTC->ISR != 7){ // Register Status Flag cold start value
+        rtc_inited=1;
+    }
+//....................
+        
+    if (rtc_inited) return;
+    rtc_inited = 1;
+ 
+    RtcHandle.Instance = RTC;
+The RSF is always '7' on a power up, then remains at '55' when the RTC has been set and on a reset. It may change to some other value depending on other RTC functions, but always seems to be '7' when MCU is powered up (without back up cell).
+
+Need to make some more checks and refinements will probably be needed.	
+//------------	
+//------------	
+//------------	
