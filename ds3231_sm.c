@@ -328,14 +328,14 @@ void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr) {
 void Set_Date_and_Time_by_str(	RTC_DateTypeDef 	*_dateSt	,
 								RTC_TimeTypeDef 	*_timeSt	) {
 
-	_dateSt->Year  = 0x20 ;
-	_dateSt->Month = 0x03 ;
-	_dateSt->Date  = 0x23 ;
+//	_dateSt->Year  = 0x20 ;
+//	_dateSt->Month = 0x03 ;
+//	_dateSt->Date  = 0x23 ;
 	ds3231_SetDate(ADR_I2C_DS3231, _dateSt) ;
 
-	_timeSt->Hours		= 0x13 ;
-	_timeSt->Minutes	= 0x55 ;
-	_timeSt->Seconds	= 0x00 ;
+//	_timeSt->Hours		= 0x13 ;
+//	_timeSt->Minutes	= 0x55 ;
+//	_timeSt->Seconds	= 0x00 ;
 	ds3231_SetTime(ADR_I2C_DS3231, _timeSt) ;
 }
 //************************************************************************
