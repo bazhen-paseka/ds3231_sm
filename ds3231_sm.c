@@ -327,16 +327,17 @@ void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr) {
 
 void Set_Date_and_Time_by_str(	RTC_DateTypeDef 	*_dateSt	,
 								RTC_TimeTypeDef 	*_timeSt	) {
+	RTC_DateTypeDef DateStr   ;
+	DateStr.Year  = 16 * ((_dateSt->Year-2000)  / 10 ) + ((_dateSt->Year-2000)  % 10 ) ;
+	DateStr.Month =	16 * (_dateSt->Month / 10 ) + (_dateSt->Month % 10 ) ;
+	DateStr.Date  =	16 * (_dateSt->Date  / 10 ) + (_dateSt->Date  % 10 ) ;
+	ds3231_SetDate(ADR_I2C_DS3231, &DateStr);
 
-//	_dateSt->Year  = 0x20 ;
-//	_dateSt->Month = 0x03 ;
-//	_dateSt->Date  = 0x23 ;
-	ds3231_SetDate(ADR_I2C_DS3231, _dateSt) ;
-
-//	_timeSt->Hours		= 0x13 ;
-//	_timeSt->Minutes	= 0x55 ;
-//	_timeSt->Seconds	= 0x00 ;
-	ds3231_SetTime(ADR_I2C_DS3231, _timeSt) ;
+	RTC_TimeTypeDef    TimeStr    ;
+	TimeStr.Hours		= 16 * ( _timeSt->Hours   / 10 ) + ( _timeSt->Hours   % 10 ) ;
+	TimeStr.Minutes	= 16 * ( _timeSt->Minutes / 10 ) + ( _timeSt->Minutes % 10 ) ;
+	TimeStr.Seconds	= 16 * ( _timeSt->Seconds / 10 ) + ( _timeSt->Seconds % 10 ) ;
+	ds3231_SetTime(ADR_I2C_DS3231, &TimeStr);
 }
 //************************************************************************
 
