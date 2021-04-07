@@ -136,7 +136,7 @@ uint8_t Ds3231_hard_alarm_flag_Status	(void) ;
 // 				END
 
 //	ABOUT RESET:
-
+/*
 if (_rtc_isenabled != NULL) {
         if (!(_rtc_isenabled())) {
                                                                  //added the following three lines
@@ -159,12 +159,13 @@ if (_rtc_isenabled != NULL) {
     }	
 //------------	
 
-    /* --- BDCR Register ---*/
-/* Alias word address of RTCEN bit */
+    // --- BDCR Register ---
+// Alias word address of RTCEN bit
+
 #define RCC_BDCR_OFFSET            (RCC_OFFSET + 0x70)
 #define RCC_RTCEN_BIT_NUMBER       0x0F
 #define RCC_BDCR_RTCEN_BB          (PERIPH_BB_BASE + (RCC_BDCR_OFFSET * 32) + (RCC_RTCEN_BIT_NUMBER * 4))
-/* Alias word address of BDRST bit */
+// Alias word address of BDRST bit
 #define RCC_BDRST_BIT_NUMBER       0x10
 #define RCC_BDCR_BDRST_BB          (PERIPH_BB_BASE + (RCC_BDCR_OFFSET * 32) + (RCC_BDRST_BIT_NUMBER * 4))
 //------------	
@@ -191,4 +192,4 @@ The RSF is always '7' on a power up, then remains at '55' when the RTC has been 
 Need to make some more checks and refinements will probably be needed.	
 //------------	
 //------------	
-//------------	
+*/
