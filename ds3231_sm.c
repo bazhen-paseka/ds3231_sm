@@ -13,57 +13,7 @@
 **************************************************************************
 */
 
-/*
-**************************************************************************
-*								    ENUM
-**************************************************************************
-*/
-typedef enum {
-	DS3231_SECONDS	= 0x00		,
-	DS3231_MINUTES				,
-	DS3231_HOUR					,
-	DS3231_WEEKDAY				,
-	DS3231_DATE					,
-	DS3231_MONTH				,
-	DS3231_YEAR					,
-	DS3231_ALARM_1_SECONDS		,
-	DS3231_ALARM_1_MINUTES		,
-	DS3231_ALARM_1_HOUR			,
-	DS3231_ALARM_1_DAY_AND_DATE	,
-	DS3231_ALARM_2_MINUTES		,
-	DS3231_ALARM_2_HOUR			,
-	DS3231_ALARM_2_DAY_AND_DATE	,
-	DS3231_CONTROL				,
-	DS3231_CONTROL_STATUS		,
-	DS3231_AGING_OFFSET			,
-	DS3231_MSB_OF_TEMP			,
-	DS3231_lSB_OF_TEMP
-}		ds3231_register ;
-//=============================================
 
-typedef enum {
-	DS3231_CONTROL_A1IE	=	0x00,
-	DS3231_CONTROL_A2IE			,
-	DS3231_CONTROL_INTCN		,
-	DS3231_CONTROL_RS1			,
-	DS3231_CONTROL_RS2			,
-	DS3231_CONTROL_CONV			,
-	DS3231_CONTROL_BBSQW		,
-	DS3231_CONTROL_EOSC
-}		ds3231_register_status ;
-//=============================================
-
-typedef enum {
-	DS3231_CNTRL_STATUS_A1F	= 0x00	,
-	DS3231_CNTRL_STATUS_A2F			,
-	DS3231_CNTRL_STATUS_BSY			,
-	DS3231_CNTRL_STATUS_EN32KHZ		,
-	DS3231_CNTRL_STATUS_EMPTY_4		,
-	DS3231_CNTRL_STATUS_EMPTY_5		,
-	DS3231_CNTRL_STATUS_EMPTY_6		,
-	DS3231_CNTRL_STATUS_OSF
-}		ds3231_register_cntrl_status ;
-//=============================================
 
 volatile uint8_t ds3231_alarm_u8 = 0 ;
 
@@ -87,18 +37,14 @@ volatile uint8_t ds3231_alarm_u8 = 0 ;
 *                              FUNCTION PROTOTYPES
 **************************************************************************
 */
-	void ds3231_SetTime( 	uint8_t 		_ds3231_i2c_adr	,
-							RTC_TimeTypeDef	*_timeSt		) ;
 
-	void ds3231_SetDate( 	uint8_t 		_ds3231_i2c_adr	,
-							RTC_DateTypeDef *_dateSt		) ;
 /*
 **************************************************************************
 *                           GLOBAL FUNCTIONS
 **************************************************************************
 */
 
-void ds3231_PrintTime(	RTC_TimeTypeDef 	*_timeSt,
+void ds3231_PrintTime(	DS3231_TimeTypeDef 	*_timeSt,
 						UART_HandleTypeDef	*_huart) {
 
 	char DataChar[100];
@@ -107,39 +53,96 @@ void ds3231_PrintTime(	RTC_TimeTypeDef 	*_timeSt,
 }
 //************************************************************************
 
-void ds3231_PrintDate(	RTC_DateTypeDef		*_dateSt	,
-						UART_HandleTypeDef	*_huart		) {
+void ds3231_PrintDate(	DS3231_DateTypeDef		*_dateSt	,
+						UART_HandleTypeDef		*_huart		) {
 
 	char DataChar[100];
-	sprintf(DataChar,"%02d/%02d/%04d ", _dateSt->Date, _dateSt->Month, 2000+ _dateSt->Year);
+	sprintf(DataChar,"%02d/%02d/%04d ", _dateSt->Date, 1 + _dateSt->Month, 2000 + _dateSt->Year);
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 }
 //************************************************************************
 
-void ds3231_PrintWeek(	RTC_DateTypeDef 	*_dateSt	,
-						UART_HandleTypeDef 	*_huart		) {
+void ds3231_PrintDate_3Char(	DS3231_DateTypeDef		*_dateSt	,
+						UART_HandleTypeDef		*_huart		) {
+
+	char DataChar[100];
+	sprintf(DataChar,"%02d-", _dateSt->Date );
+	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	switch(_dateSt->Month) {
+		case   0: sprintf( DataChar , "JAN"	) ;		break ;
+		case   1: sprintf( DataChar , "FEB"	) ;		break ;
+		case   2: sprintf( DataChar , "MAR"	) ;		break ;
+		case   3: sprintf( DataChar , "APR"	) ;		break ;
+		case   4: sprintf( DataChar , "MAY"	) ;		break ;
+		case   5: sprintf( DataChar , "JUN"	) ;		break ;
+		case   6: sprintf( DataChar , "JUL"	) ;		break ;
+		case   7: sprintf( DataChar , "AUG"	) ;		break ;
+		case   8: sprintf( DataChar , "SEP"	) ;		break ;
+		case   9: sprintf( DataChar , "OCT"	) ;		break ;
+		case  10: sprintf( DataChar , "NOV"	) ;		break ;
+		case  11: sprintf( DataChar , "DEC"	) ;		break ;
+		default : sprintf( DataChar , "ovf"	) ;		break ;
+		} // end switch Date.ST
+	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	sprintf(DataChar,"-%04d ", 2000+ _dateSt->Year);
+	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+}
+//************************************************************************
+
+void ds3231_PrintDate_AllChar(	DS3231_DateTypeDef		*_dateSt	,
+								UART_HandleTypeDef		*_huart		) {
+
+	char DataChar[100];
+	sprintf(DataChar,"%02d-", _dateSt->Date );
+	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	switch(_dateSt->Month) {
+		case   0: sprintf( DataChar , "January"		) ;		break ;
+		case   1: sprintf( DataChar , "February"	) ;		break ;
+		case   2: sprintf( DataChar , "March"		) ;		break ;
+		case   3: sprintf( DataChar , "April"		) ;		break ;
+		case   4: sprintf( DataChar , "May"			) ;		break ;
+		case   5: sprintf( DataChar , "June"		) ;		break ;
+		case   6: sprintf( DataChar , "July"		) ;		break ;
+		case   7: sprintf( DataChar , "August"		) ;		break ;
+		case   8: sprintf( DataChar , "September"	) ;		break ;
+		case   9: sprintf( DataChar , "October"		) ;		break ;
+		case  10: sprintf( DataChar , "November"	) ;		break ;
+		case  11: sprintf( DataChar , "December"	) ;		break ;
+		default : sprintf( DataChar , "ovf"			) ;		break ;
+		} // end switch Date.ST
+	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	sprintf(DataChar,"-%04d ", 2000+ _dateSt->Year);
+	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
+}
+//************************************************************************
+void ds3231_PrintWeek_AllChar(	DS3231_DateTypeDef 	*_dateSt	,
+								UART_HandleTypeDef 	*_huart		) {
 
 	char DataChar[100] ;
 	switch(_dateSt->WeekDay) {
-		case  0: sprintf( DataChar , "Sunday "		) ;		break ;
-		case  1: sprintf( DataChar , "Monday "		) ;		break ;
-		case  2: sprintf( DataChar , "Tuesday "		) ;		break ;
+		case  0: sprintf( DataChar , "Sunday    "	) ;		break ;
+		case  1: sprintf( DataChar , "Monday    "	) ;		break ;
+		case  2: sprintf( DataChar , "Tuesday   "	) ;		break ;
 		case  3: sprintf( DataChar , "Wednesday "	) ;		break ;
-		case  4: sprintf( DataChar , "Thursday "	) ;		break ;
-		case  5: sprintf( DataChar , "Friday "		) ;		break ;
-		case  6: sprintf( DataChar , "Saturday "	) ;		break ;
-		case  7: sprintf( DataChar , "Sunday "		) ;		break ;
-		default: sprintf( DataChar , "Out of day "	) ;		break ;
+		case  4: sprintf( DataChar , "Thursday  "	) ;		break ;
+		case  5: sprintf( DataChar , "Friday    "	) ;		break ;
+		case  6: sprintf( DataChar , "Saturday  "	) ;		break ;
+		case  7: sprintf( DataChar , "Sunday    "	) ;		break ;
+		default: sprintf( DataChar , "Out of day"	) ;		break ;
 		} // end switch Date.ST
 	HAL_UART_Transmit(_huart, (uint8_t *)DataChar, strlen(DataChar), 100);
 }
 //************************************************************************
 
-void ds3231_PrintWeek3char(	RTC_DateTypeDef 	*_dateSt	,
+void ds3231_PrintWeek_3Char(	DS3231_DateTypeDef 	*_dateSt	,
 							UART_HandleTypeDef	*_huart		) {
 
 	char DataChar[5] ;
-	uint8_t day_u8 = ( _dateSt->WeekDay + 3 ) %6 ;
+	uint8_t day_u8 = _dateSt->WeekDay ;
 	switch(day_u8) {
 		case  0: sprintf( DataChar , "SUN " ) ;	break ;
 		case  1: sprintf( DataChar , "MON " ) ;	break ;
@@ -149,14 +152,14 @@ void ds3231_PrintWeek3char(	RTC_DateTypeDef 	*_dateSt	,
 		case  5: sprintf( DataChar , "FRI " ) ;	break ;
 		case  6: sprintf( DataChar , "SAT " ) ;	break ;
 		case  7: sprintf( DataChar , "SUN" ) ; 	break ;
-		default: sprintf( DataChar , "ERR" ) ;	break ;
+		default: sprintf( DataChar , "err" ) ;	break ;
 		} // end switch Date.ST
 	HAL_UART_Transmit( _huart , (uint8_t *)DataChar , strlen(DataChar) , 100) ;
 }
 //************************************************************************
 
-void ds3231_GetTime(	uint8_t 			_ds3231_i2c_adr	,
-						RTC_TimeTypeDef		*_timeSt		) {
+void ds3231_GetTime(	uint8_t 				_ds3231_i2c_adr	,
+						DS3231_TimeTypeDef		*_timeSt		) {
 
 	uint8_t ds3231_Seconds ;
 	uint8_t ds3231_Minutes ;
@@ -172,8 +175,8 @@ void ds3231_GetTime(	uint8_t 			_ds3231_i2c_adr	,
 }
 //************************************************************************
 
-void ds3231_GetDate(	uint8_t 			_ds3231_i2c_adr	,
-						RTC_DateTypeDef		*_dateSt		) {
+void ds3231_GetDate(	uint8_t 				_ds3231_i2c_adr	,
+						DS3231_DateTypeDef		*_dateSt		) {
 
 	uint8_t ds3231_WeekDay ;
 	uint8_t ds3231_Date    ;
@@ -181,33 +184,44 @@ void ds3231_GetDate(	uint8_t 			_ds3231_i2c_adr	,
 	uint8_t ds3231_Year    ;
 
 	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_WEEKDAY, &ds3231_WeekDay, 100 ) ;
-	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_DATE	, &ds3231_Date,    100 ) ;
-	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_MONTH	, &ds3231_Mouth,   100 ) ;
-	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_YEAR	, &ds3231_Year,    100 ) ;
+	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_DATE	 , &ds3231_Date,    100 ) ;
+	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_MONTH	 , &ds3231_Mouth,   100 ) ;
+	I2Cdev_readByte( _ds3231_i2c_adr , DS3231_YEAR	 , &ds3231_Year,    100 ) ;
 
-	_dateSt->WeekDay = (ds3231_WeekDay >> 4)*10 + (ds3231_WeekDay &0x0F ) ;
-	_dateSt->Date    = (ds3231_Date    >> 4)*10 + (ds3231_Date    &0x0F ) ;
-	_dateSt->Month   = (ds3231_Mouth   >> 4)*10 + (ds3231_Mouth   &0x0F ) ;
-	_dateSt->Year    = (ds3231_Year    >> 4)*10 + (ds3231_Year    &0x0F ) ;
+	_dateSt->WeekDay = (ds3231_WeekDay >> 4) * 10 + (ds3231_WeekDay &0x0F ) ;
+	_dateSt->Date    = (ds3231_Date    >> 4) * 10 + (ds3231_Date    &0x0F ) ;
+	_dateSt->Month   = (ds3231_Mouth   >> 4) * 10 + (ds3231_Mouth   &0x0F ) ;
+	_dateSt->Year    = (ds3231_Year    >> 4) * 10 + (ds3231_Year    &0x0F ) ;
 }
 //************************************************************************
 
-void ds3231_SetTime(	uint8_t 			_ds3231_i2c_adr	,
-						RTC_TimeTypeDef		*_timeSt		) {
+void ds3231_SetTime(	uint8_t 				_ds3231_i2c_adr	,
+						DS3231_TimeTypeDef		*_timeSt		) {
 
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_SECONDS, _timeSt->Seconds ) ;
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_MINUTES, _timeSt->Minutes ) ;
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_HOUR	 , _timeSt->Hours   ) ;
+	DS3231_TimeTypeDef    TimeStr    ;
+	TimeStr.Hours	= 16 * ( _timeSt->Hours   / 10 ) + ( _timeSt->Hours   % 10 ) ;
+	TimeStr.Minutes	= 16 * ( _timeSt->Minutes / 10 ) + ( _timeSt->Minutes % 10 ) ;
+	TimeStr.Seconds	= 16 * ( _timeSt->Seconds / 10 ) + ( _timeSt->Seconds % 10 ) ;
+
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_SECONDS, TimeStr.Seconds ) ;
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_MINUTES, TimeStr.Minutes ) ;
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_HOUR	 , TimeStr.Hours   ) ;
 }
 //************************************************************************
 
-void ds3231_SetDate(	uint8_t 			_ds3231_i2c_adr	,
-						RTC_DateTypeDef		*_dateSt		) {
+void ds3231_SetDate(	uint8_t 				_ds3231_i2c_adr	,
+						DS3231_DateTypeDef		*_dateSt		) {
 
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_WEEKDAY, _dateSt->WeekDay ) ;
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_DATE	 , _dateSt->Date    ) ;
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_MONTH  , _dateSt->Month   ) ;
-	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_YEAR   , _dateSt->Year    );
+	DS3231_DateTypeDef 	DateStr   ;
+	DateStr.WeekDay = _dateSt->WeekDay ;
+	DateStr.Year	= 16 * (_dateSt->Year  / 10 ) + (_dateSt->Year  % 10 ) ;
+	DateStr.Month	= 16 * (_dateSt->Month / 10 ) + (_dateSt->Month % 10 ) ;
+	DateStr.Date	= 16 * (_dateSt->Date  / 10 ) + (_dateSt->Date  % 10 ) ;
+
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_WEEKDAY, DateStr.WeekDay ) ;
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_DATE	 , DateStr.Date    ) ;
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_MONTH  , DateStr.Month   ) ;
+	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_YEAR   , DateStr.Year    );
 }
 //************************************************************************
 
@@ -225,7 +239,7 @@ void ds3231_Alarm1_SetEverySeconds(	uint8_t 	_ds3231_i2c_adr ) {
 }
 //************************************************************************
 
-void ds3231_Alarm2_SetEveryMinutes(uint8_t 	_ds3231_i2c_adr) {
+void ds3231_Alarm2_SetEveryMinutes( uint8_t 	_ds3231_i2c_adr) {
 
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_MINUTES		, 1UL<<7 );
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_ALARM_2_HOUR	 		, 1UL<<7 );
@@ -299,7 +313,7 @@ void ds3231_Alarm2_SetHoursAndMinuses(	uint8_t 	_ds3231_i2c_adr	,
 //************************************************************************
 
 
-void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr) {
+void ds3231_Alarm1_ClearStatusBit(uint8_t 	_ds3231_i2c_adr) {
 
 	uint8_t status_bit;
 	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, &status_bit, 100   );
@@ -307,7 +321,7 @@ void ds3231_Alarm1_ClearStatusBit(uint8_t _ds3231_i2c_adr) {
 	I2Cdev_writeByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, status_bit );
 }
 
-void ds3231_Alarm2_ClearStatusBit(uint8_t _ds3231_i2c_adr) {
+void ds3231_Alarm2_ClearStatusBit(uint8_t 	_ds3231_i2c_adr) {
 
 	uint8_t status_bit;
 	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL_STATUS, &status_bit, 100   );
@@ -316,7 +330,7 @@ void ds3231_Alarm2_ClearStatusBit(uint8_t _ds3231_i2c_adr) {
 }
 //************************************************************************
 
-void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr) {
+void ds3231_Alarm1_Stop(uint8_t 	_ds3231_i2c_adr) {
 
 	uint8_t alarm_status ;
 	I2Cdev_readByte ( _ds3231_i2c_adr, DS3231_CONTROL, &alarm_status, 100   );
@@ -325,45 +339,41 @@ void ds3231_Alarm1_Stop(uint8_t _ds3231_i2c_adr) {
 }
 //************************************************************************
 
-void Set_Date_and_Time_by_str(	RTC_DateTypeDef 	*_dateSt	,
-								RTC_TimeTypeDef 	*_timeSt	) {
+void Set_Date_and_Time_by_str(	DS3231_DateTypeDef 	*_dateSt	,
+								DS3231_TimeTypeDef 	*_timeSt	) {
 
-	_dateSt->Year  = 0x20 ;
-	_dateSt->Month = 0x03 ;
-	_dateSt->Date  = 0x23 ;
-	ds3231_SetDate(ADR_I2C_DS3231, _dateSt) ;
-
-	_timeSt->Hours		= 0x13 ;
-	_timeSt->Minutes	= 0x55 ;
-	_timeSt->Seconds	= 0x00 ;
-	ds3231_SetTime(ADR_I2C_DS3231, _timeSt) ;
+	ds3231_SetDate(ADR_I2C_DS3231, _dateSt);
+	ds3231_SetTime(ADR_I2C_DS3231, _timeSt);
 }
 //************************************************************************
 
-void Set_Day_and_Time_to_DS3231(	uint16_t 	_year_u16	,
+void Set_Date_and_Time_to_DS3231(	uint16_t 	_year_u16	,
 									uint8_t 	_month_u8	,
-									uint8_t 	_date_u8	,
+									uint8_t 	_day_u8		,
+									uint8_t 	_weekday_u8	,
 									uint8_t 	_hours_u8	,
 									uint8_t 	_minutes_u8	,
 									uint8_t 	_seconds_u8	) {
 
-	RTC_DateTypeDef DateStr   ;
+	DS3231_DateTypeDef DateStr   ;
 	uint8_t _year_u8 = (uint8_t)(_year_u16 - 2000) ;
-	DateStr.Year  = ( _year_u8/10)*16 +  _year_u8%10 ;
-	DateStr.Month = (_month_u8/10)*16 + _month_u8%10 ;
-	DateStr.Date  = ( _date_u8/10)*16 +  _date_u8%10 ;
-	ds3231_SetDate(ADR_I2C_DS3231, &DateStr);
+	DateStr.Year	= _year_u8		;
+	DateStr.Month	= _month_u8		;
+	DateStr.Date	= _day_u8		;
+	DateStr.WeekDay	= _weekday_u8	;
+	ds3231_SetDate( ADR_I2C_DS3231, &DateStr ) ;
 
-	RTC_TimeTypeDef    TimeStr    ;
-	TimeStr.Hours   = (  _hours_u8/10)*16 +   _hours_u8%10 ;
-	TimeStr.Minutes = (_minutes_u8/10)*16 + _minutes_u8%10 ;
-	TimeStr.Seconds = (_seconds_u8/10)*16 + _seconds_u8%10 ;
+	DS3231_TimeTypeDef    TimeStr    ;
+	TimeStr.Hours   = _hours_u8   ;
+	TimeStr.Minutes = _minutes_u8 ;
+	TimeStr.Seconds = _seconds_u8 ;
 	ds3231_SetTime(ADR_I2C_DS3231, &TimeStr);
 }
 
 //************************************************************************
 
-uint8_t ds3231_Get_Alarm1_Status(uint8_t _ds3231_i2c_adr) {
+uint8_t ds3231_Get_Alarm1_Status(uint8_t 	_ds3231_i2c_adr) {
+
 	uint8_t alarm1_status_u8 = 0;
 	uint8_t control_status_u8 = 0;
 	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
@@ -372,7 +382,8 @@ uint8_t ds3231_Get_Alarm1_Status(uint8_t _ds3231_i2c_adr) {
 }
 //************************************************************************
 
-uint8_t ds3231_Get_Alarm2_Status(uint8_t _ds3231_i2c_adr) {
+uint8_t ds3231_Get_Alarm2_Status(uint8_t 	_ds3231_i2c_adr) {
+
 	uint8_t alarm_status_u8 = 0;
 	uint8_t control_status_u8 = 0;
 	I2Cdev_readByte( _ds3231_i2c_adr, DS3231_CONTROL_STATUS , &control_status_u8, 100);
