@@ -34,19 +34,72 @@
 *								    DEFINES
 **************************************************************************
 */
+	typedef struct	{
+		uint8_t		Hours	;
+		uint8_t		Minutes	;
+		uint8_t		Seconds	;
+	}	DS3231_TimeTypeDef;
+	//=============================================
 
-typedef struct	{
-	uint8_t		Hours	;
-	uint8_t		Minutes	;
-	uint8_t		Seconds	;
-}	DS3231_TimeTypeDef;
+	typedef struct	{
+		uint8_t		Year	;
+		uint8_t		Month	;
+		uint8_t		Date	;
+		uint8_t		WeekDay	;
+	}	DS3231_DateTypeDef;
+	//=============================================
 
-typedef struct	{
-	uint8_t		Year	;
-	uint8_t		Month	;
-	uint8_t		Date	;
-	uint8_t		WeekDay	;
-}	DS3231_DateTypeDef;
+/*
+**************************************************************************
+*								    ENUM
+**************************************************************************
+*/
+	typedef enum {
+		DS3231_SECONDS	= 0x00		,
+		DS3231_MINUTES				,
+		DS3231_HOUR					,
+		DS3231_WEEKDAY				,
+		DS3231_DATE					,
+		DS3231_MONTH				,
+		DS3231_YEAR					,
+		DS3231_ALARM_1_SECONDS		,
+		DS3231_ALARM_1_MINUTES		,
+		DS3231_ALARM_1_HOUR			,
+		DS3231_ALARM_1_DAY_AND_DATE	,
+		DS3231_ALARM_2_MINUTES		,
+		DS3231_ALARM_2_HOUR			,
+		DS3231_ALARM_2_DAY_AND_DATE	,
+		DS3231_CONTROL				,
+		DS3231_CONTROL_STATUS		,
+		DS3231_AGING_OFFSET			,
+		DS3231_MSB_OF_TEMP			,
+		DS3231_lSB_OF_TEMP
+	}		ds3231_register ;
+	//=============================================
+
+	typedef enum {
+		DS3231_CONTROL_A1IE	=	0x00,
+		DS3231_CONTROL_A2IE			,
+		DS3231_CONTROL_INTCN		,
+		DS3231_CONTROL_RS1			,
+		DS3231_CONTROL_RS2			,
+		DS3231_CONTROL_CONV			,
+		DS3231_CONTROL_BBSQW		,
+		DS3231_CONTROL_EOSC
+	}		ds3231_register_status ;
+	//=============================================
+
+	typedef enum {
+		DS3231_CNTRL_STATUS_A1F	= 0x00	,
+		DS3231_CNTRL_STATUS_A2F			,
+		DS3231_CNTRL_STATUS_BSY			,
+		DS3231_CNTRL_STATUS_EN32KHZ		,
+		DS3231_CNTRL_STATUS_EMPTY_4		,
+		DS3231_CNTRL_STATUS_EMPTY_5		,
+		DS3231_CNTRL_STATUS_EMPTY_6		,
+		DS3231_CNTRL_STATUS_OSF
+	}		ds3231_register_cntrl_status ;
+	//=============================================
 
 /*
 **************************************************************************
@@ -54,65 +107,71 @@ typedef struct	{
 **************************************************************************
 */
 
-void Set_Date_and_Time_by_str(	DS3231_DateTypeDef * _dateSt	,
-								DS3231_TimeTypeDef * _timeSt	) ;
+void Set_Date_and_Time_by_str(		DS3231_DateTypeDef 	*_dateSt	,
+									DS3231_TimeTypeDef 	*_timeSt	) ;
 
-void Set_Date_and_Time_to_DS3231(	uint16_t _year_u16		,
-									uint8_t _month_u8		,
-									uint8_t _day_u8			,
-									uint8_t _weekday_u8		,
-									uint8_t _hours_u8		,
-									uint8_t _minutes_u8		,
-									uint8_t _seconds_u8		) ;
+void Set_Date_and_Time_to_DS3231(	uint16_t 	_year_u16		,
+									uint8_t 	_month_u8		,
+									uint8_t 	_day_u8			,
+									uint8_t 	_weekday_u8		,
+									uint8_t 	_hours_u8		,
+									uint8_t 	_minutes_u8		,
+									uint8_t 	_seconds_u8		) ;
 
-void ds3231_GetTime(	uint8_t _ds3231_i2c_adr			,
-						DS3231_TimeTypeDef * _timeSt		) ;
-void ds3231_GetDate (	uint8_t _ds3231_i2c_adr			,
-						DS3231_DateTypeDef * _dateSt		) ;
-
-void ds3231_SetTime( 	uint8_t 		_ds3231_i2c_adr	,
+void ds3231_GetTime(	uint8_t				_ds3231_i2c_adr	,
 						DS3231_TimeTypeDef	*_timeSt		) ;
-void ds3231_SetDate( 	uint8_t 		_ds3231_i2c_adr	,
-						DS3231_DateTypeDef *_dateSt		) ;
 
-void ds3231_PrintTime(	DS3231_TimeTypeDef * _timeSt		,
-						UART_HandleTypeDef *_huart)		;
+void ds3231_GetDate (	uint8_t 			_ds3231_i2c_adr	,
+						DS3231_DateTypeDef	*_dateSt		) ;
 
-void ds3231_PrintDate(	DS3231_DateTypeDef * _dateSt		,
-						UART_HandleTypeDef *_huart)		;
+void ds3231_SetTime( 	uint8_t 			_ds3231_i2c_adr	,
+						DS3231_TimeTypeDef	*_timeSt		) ;
+void ds3231_SetDate( 	uint8_t 			_ds3231_i2c_adr	,
+						DS3231_DateTypeDef 	*_dateSt		) ;
 
-void ds3231_PrintWeekAllChar(	DS3231_DateTypeDef * _dateSt		,
-								UART_HandleTypeDef *_huart)		;
+void ds3231_PrintTime(	DS3231_TimeTypeDef 	*_timeSt		,
+						UART_HandleTypeDef 	*_huart)		;
 
-void ds3231_PrintWeek3char(		DS3231_DateTypeDef * _dateSt,
-								UART_HandleTypeDef *_huart) 	;
+void ds3231_PrintDate(	DS3231_DateTypeDef 	*_dateSt	,
+						UART_HandleTypeDef 	*_huart)	;
 
+void ds3231_PrintDate_3Char(	DS3231_DateTypeDef	*_dateSt	,
+								UART_HandleTypeDef	*_huart)	;
 
-void ds3231_Alarm1_SetEverySeconds(		uint8_t _ds3231_i2c_adr)	;
+void ds3231_PrintDate_AllChar(	DS3231_DateTypeDef 	*_dateSt	,
+								UART_HandleTypeDef 	*_huart)	;
 
-void ds3231_Alarm1_SetSeconds(			uint8_t _ds3231_i2c_adr,
-										uint8_t _second)			;
+void ds3231_PrintWeek_3Char(	DS3231_DateTypeDef 	*_dateSt	,
+								UART_HandleTypeDef 	*_huart) 	;
 
-void ds3231_Alarm1_SetHoursAndMinuses(	uint8_t _ds3231_i2c_adr	,
-										uint8_t _hours			,
-										uint8_t _minutes)			;
+void ds3231_PrintWeek_AllChar(	DS3231_DateTypeDef 	*_dateSt	,
+								UART_HandleTypeDef 	*_huart)	;
 
-void ds3231_Alarm2_SetEveryMinutes(		uint8_t _ds3231_i2c_adr)	;
+void ds3231_Alarm1_SetEverySeconds(		uint8_t 	_ds3231_i2c_adr)	;
 
-void ds3231_Alarm2_SetMinuses(			uint8_t _ds3231_i2c_adr,
-										uint8_t _minutes)			;
+void ds3231_Alarm1_SetSeconds(			uint8_t 	_ds3231_i2c_adr		,
+										uint8_t 	_second)			;
 
-void ds3231_Alarm2_SetHoursAndMinuses(	uint8_t _ds3231_i2c_adr	,
-										uint8_t _hours			,
-										uint8_t _minutes		)	;
+void ds3231_Alarm1_SetHoursAndMinuses(	uint8_t 	_ds3231_i2c_adr		,
+										uint8_t 	_hours				,
+										uint8_t 	_minutes)			;
 
-void ds3231_Alarm1_Stop(				uint8_t _ds3231_i2c_adr)	;
+void ds3231_Alarm2_SetEveryMinutes(		uint8_t 	_ds3231_i2c_adr)	;
 
-void ds3231_Alarm1_ClearStatusBit(		uint8_t _ds3231_i2c_adr)	;
-void ds3231_Alarm2_ClearStatusBit(		uint8_t _ds3231_i2c_adr)	;
+void ds3231_Alarm2_SetMinuses(			uint8_t 	_ds3231_i2c_adr,
+										uint8_t 	_minutes)			;
 
-uint8_t ds3231_Get_Alarm1_Status(		uint8_t _ds3231_i2c_adr)	;
-uint8_t ds3231_Get_Alarm2_Status(		uint8_t _ds3231_i2c_adr)	;
+void ds3231_Alarm2_SetHoursAndMinuses(	uint8_t 	_ds3231_i2c_adr		,
+										uint8_t 	_hours				,
+										uint8_t 	_minutes			) ;
+
+void ds3231_Alarm1_Stop(				uint8_t 	_ds3231_i2c_adr)	;
+
+void ds3231_Alarm1_ClearStatusBit(		uint8_t 	_ds3231_i2c_adr)	;
+void ds3231_Alarm2_ClearStatusBit(		uint8_t 	_ds3231_i2c_adr)	;
+
+uint8_t ds3231_Get_Alarm1_Status(		uint8_t 	_ds3231_i2c_adr)	;
+uint8_t ds3231_Get_Alarm2_Status(		uint8_t 	_ds3231_i2c_adr)	;
 
 void 	Ds3231_hard_alarm_flag_Set(		void	) ;
 void 	Ds3231_hard_alarm_flag_Reset(	void	) ;
@@ -123,7 +182,6 @@ uint8_t Ds3231_hard_alarm_flag_Status(	void	) ;
 *                                   END
 **************************************************************************
 */
-
 #endif // DS3231_SM_H_INCLUDED
 
 
@@ -204,7 +262,7 @@ if (_rtc_isenabled != NULL) {
     }	
 //------------	
 
-    // --- BDCR Register ---
+// --- BDCR Register ---
 // Alias word address of RTCEN bit
 
 #define RCC_BDCR_OFFSET            (RCC_OFFSET + 0x70)
@@ -235,6 +293,4 @@ void rtc_init(void)
 The RSF is always '7' on a power up, then remains at '55' when the RTC has been set and on a reset. It may change to some other value depending on other RTC functions, but always seems to be '7' when MCU is powered up (without back up cell).
 
 Need to make some more checks and refinements will probably be needed.	
-//------------	
-//------------	
 */
