@@ -27,7 +27,7 @@
 	#include <string.h>
 	#include "stdio.h"
 
-	#include "ds3231_local_config.h"
+	#include "Local_config.h"
 	#include "i2c_techmaker_sm.h"
 /*
 **************************************************************************
